@@ -1,0 +1,25 @@
+project:
+  name: "RazorGuard AI"
+  version: "0.1.0"
+  environment: "development"
+
+data:
+  raw_path: "data/raw"
+  processed_path: "data/processed"
+  synthetic_path: "data/synthetic"
+
+model:
+  random_state: 42
+  test_size: 0.2
+  validation_size: 0.2
+
+risk:
+  low_threshold: 0.30
+  high_threshold: 0.75
+
+mlflow:
+  experiment_name: "razorguard-fraud-detection"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
