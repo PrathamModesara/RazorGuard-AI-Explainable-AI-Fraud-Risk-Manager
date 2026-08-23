@@ -1,0 +1,33 @@
+project:
+  name: RazorGuard AI
+  version: "0.1.0"
+
+data:
+  train_path: data/splits/train.csv
+  validation_path: data/splits/validation.csv
+  test_path: data/splits/test.csv
+
+target:
+  column: isFraud
+
+id:
+  column: TransactionID
+
+split:
+  random_state: 42
+
+evaluation:
+  primary_metric: average_precision
+  metrics:
+    - average_precision
+    - precision
+    - recall
+    - f1
+    - roc_auc
+    - confusion_matrix
+
+baseline_model:
+  name: logistic_regression
+  class_weight: balanced
+  max_iter: 1000
+  random_state: 42

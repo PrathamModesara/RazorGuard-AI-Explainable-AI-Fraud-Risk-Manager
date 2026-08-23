@@ -1,0 +1,50 @@
+features:
+
+  transaction:
+    - TransactionAmt
+    - TransactionDT
+    - ProductCD
+
+  payment:
+    - card4
+    - card6
+
+  email:
+    - P_emaildomain
+    - R_emaildomain
+
+  address:
+    - addr1
+    - dist1
+
+  identity:
+    - DeviceType
+    - DeviceInfo
+
+derived:
+
+  transaction_amount:
+    - amount_log
+    - amount_bucket
+
+  time:
+    - transaction_hour
+    - transaction_day
+    - is_early_morning
+    - is_night
+
+  missingness:
+    - p_email_missing
+    - r_email_missing
+    - card4_missing
+    - card6_missing
+    - addr1_missing
+    - dist1_missing
+    - device_type_missing
+    - device_info_missing
+
+target:
+  name: isFraud
+
+id:
+  name: TransactionID
