@@ -56,7 +56,7 @@ OLLAMA_BASE_URL = os.getenv(
     "http://localhost:11434/v1",
 )
 
-MAX_OUTPUT_TOKENS = 500
+MAX_OUTPUT_TOKENS = 700
 
 
 # ============================================================
