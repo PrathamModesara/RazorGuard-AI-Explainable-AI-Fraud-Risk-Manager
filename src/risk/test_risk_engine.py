@@ -1,61 +1,96 @@
+import pytest
+
 from src.risk.risk_analysis import RiskEngine
 
 
-def main():
-    engine = RiskEngine(
+@pytest.fixture
+def engine():
+    return RiskEngine(
         medium_threshold=0.30,
         high_threshold=0.80,
         threshold_version="v1",
     )
 
-    test_transactions = [
-        (100001, 0.12),
-        (100002, 0.45),
-        (100003, 0.81),
-        (100004, 0.97),
-    ]
 
-    print("=" * 70)
-    print("RazorGuard AI - Risk Engine Test")
-    print("=" * 70)
+def test_low_risk_approve(engine):
+    result = engine.evaluate(
+        transaction_id=100001,
+        fraud_probability=0.12,
+    )
 
-    for transaction_id, probability in test_transactions:
+    assert result.risk_score == 12.0
+    assert result.risk_level == "LOW"
+    assert result.decision == "APPROVE"
+    assert result.threshold_version == "v1"
 
-        result = engine.evaluate(
-            transaction_id=transaction_id,
+
+def test_medium_risk_step_up_verification(engine):
+    result = engine.evaluate(
+        transaction_id=100002,
+        fraud_probability=0.45,
+    )
+
+    assert result.risk_score == 45.0
+    assert result.risk_level == "MEDIUM"
+    assert result.decision == "STEP_UP_VERIFICATION"
+
+
+def test_high_risk_block_or_review(engine):
+    result = engine.evaluate(
+        transaction_id=100003,
+        fraud_probability=0.81,
+    )
+
+    assert result.risk_score == 81.0
+    assert result.risk_level == "HIGH"
+    assert result.decision == "BLOCK_OR_REVIEW"
+
+
+def test_threshold_boundaries(engine):
+    medium = engine.evaluate(
+        transaction_id=100004,
+        fraud_probability=0.30,
+    )
+
+    high = engine.evaluate(
+        transaction_id=100005,
+        fraud_probability=0.80,
+    )
+
+    assert medium.risk_level == "MEDIUM"
+    assert medium.decision == "STEP_UP_VERIFICATION"
+
+    assert high.risk_level == "HIGH"
+    assert high.decision == "BLOCK_OR_REVIEW"
+
+
+@pytest.mark.parametrize(
+    "probability",
+    [-0.01, 1.01],
+)
+def test_invalid_probability_rejected(engine, probability):
+    with pytest.raises(ValueError):
+        engine.evaluate(
+            transaction_id=100006,
             fraud_probability=probability,
         )
 
-        print(
-            f"\nTransaction: "
-            f"{result.transaction_id}"
+
+def test_invalid_thresholds_rejected():
+    with pytest.raises(ValueError):
+        RiskEngine(
+            medium_threshold=0.80,
+            high_threshold=0.30,
         )
 
-        print(
-            f"Fraud probability: "
-            f"{result.fraud_probability}"
+    with pytest.raises(ValueError):
+        RiskEngine(
+            medium_threshold=-0.10,
+            high_threshold=0.80,
         )
 
-        print(
-            f"Risk score: "
-            f"{result.risk_score}"
+    with pytest.raises(ValueError):
+        RiskEngine(
+            medium_threshold=0.30,
+            high_threshold=1.10,
         )
-
-        print(
-            f"Risk level: "
-            f"{result.risk_level}"
-        )
-
-        print(
-            f"Decision: "
-            f"{result.decision}"
-        )
-
-        print(
-            f"Threshold version: "
-            f"{result.threshold_version}"
-        )
-
-
-if __name__ == "__main__":
-    main()
